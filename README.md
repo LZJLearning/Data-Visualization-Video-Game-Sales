@@ -1,14 +1,12 @@
-# Video Game Sales — Streamlit Dashboard (LZJ)
+# 🎮 Global Video Game Sales Data Analysis
+(Source: vgsales.csv | https://www.kaggle.com/datasets/gregorut/videogamesales)
 
-本项目展示电子游戏销量数据的交互式叙事仪表盘，满足以下要求：
-- 侧边栏：两个 LOGO + 个人信息 + 年份筛选（最大值可调，封顶 2016）
-- 引言：数据集介绍 + df.info() 结构
-- 小倍图：各地区随时间趋势，标题旁地区筛选框
-- 最后一张表：清洗前后行数及损失比率
+## 📖 Project Overview
+This project conducts a comprehensive analysis of historical global video game sales data (1980-2016). Beyond mere data visualization, it delves into the **core drivers of success** in the gaming industry, uncovering strategic insights on regional preferences, platform dynamics, genre trends, and publisher influence.
 
-## 运行
-```bash
+## 🎯 **Core Question Answered**: "What does the data tell industry professionals about creating a successful video game?"
+
+## Run
 cd streamlit_vgsales_dashboard
 pip install -r requirements.txt
 streamlit run app.py
-```

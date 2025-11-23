@@ -1,31 +1,31 @@
 import streamlit as st
 from utils.prep import apply_filters, make_tables
-from utils.viz import line_chart_timeseries, single_region_line_chart, pie_chart_region_share
+from utils.viz import line_chart_timeseries, single_region_line_chart, pie_chart_region_share,region_sales_choropleth_map
 
 def render(raw_df):
     
-    # 1) 预先创建一个 KPI 容器（占位在页面更上方）
+    #place
     kpi_box = st.container()
 
-    # === 趋势：标题与最大年份滑块并排 ===
+    # trend
     left, right = st.columns([3, 3])
     with left:
-        st.subheader("趋势：全球销量按年份")
-    # 计算年份范围
+        st.subheader("Trend：Annual trend analysis")
+    # Year range
     years_all = sorted(raw_df['Year'].dropna().unique().tolist())
     year_min = int(min(years_all)) 
     year_cap_max = 2016
     default_max = int(min(max(years_all), year_cap_max)) 
     with right:
-        max_year = st.slider("最大年份", min_value=year_min, max_value=year_cap_max, value=default_max)
+        max_year = st.slider("Years", min_value=year_min, max_value=year_cap_max, value=default_max)
 
     # 基于滑块进行局部筛选（本 section 内部）
     df_year = apply_filters(raw_df, years=(year_min, max_year))
     local_tables = make_tables(df_year)
     
-    # 4) 在“上方”的 KPI 容器里渲染动态 KPI（随滑块变化）
+    # kpi container
     with kpi_box:
-        st.subheader("关键指标")
+        st.subheader("KPIs")
         global_sales = df_year['Global_Sales'].sum()
         current_year_sales = raw_df.loc[raw_df['Year'] == max_year, 'Global_Sales'].sum()
         prev_year_sales = raw_df.loc[raw_df['Year'] == (max_year - 1), 'Global_Sales'].sum()
@@ -33,19 +33,39 @@ def render(raw_df):
         # 格式为 +X.XX% / -X.XX%
         delta_str = f"{delta_pct:+.2f}%"
 
-        st.metric("全球销量（合计）", f"{global_sales:.2f} M", delta=delta_str)
+        st.metric("Global sales(sum)", f"{global_sales:.2f} M", delta=delta_str)
 
-    # 折线图：全球销量按年份
+    # line
     line_chart_timeseries(local_tables['timeseries_global'], 'Year', 'Global_Sales', 'Global Sales by Year')
+    st.write("""
+             Early (1980-1995): Low sales, not exceeding 100 million per year;  
+             In 2000, sales grew rapidly, especially after 2006, with annual sales exceeding 500 million and reaching its peak in 2008, with annual sales exceeding 600 million;  
+             From this, it can be seen that the years 2006 to 2009 were the ‘golden age’ of the gaming industry;  
+             But after 2010 years, game sales will continue to decline, and its development focus and business model may change
+             """)
+    st.write("—————————————————————————————————————————————————————————————————")
 
-    # === 各地区随时间趋势（一次只选一个地区） ===
-    st.subheader("各地区随时间趋势")
-    regions_all = local_tables['timeseries_regions']['Region'].unique().tolist()
-    selected_region = st.selectbox("选择一个地区", regions_all)
-    region_ts = local_tables['timeseries_regions'][local_tables['timeseries_regions']['Region'] == selected_region]
-    single_region_line_chart(region_ts, f"{selected_region} 地区销量趋势")
-
-    # === 饼图：各地区在全球销量的占比（基于当前年份筛选的区间） ===
-    st.subheader("地区在全球销量中的占比")
+    # Pie
+    st.subheader("The proportion of regional sales in global sales")
     region_share = local_tables['timeseries_regions'].groupby('Region', as_index=False)['Regional_Sales'].sum()
-    pie_chart_region_share(region_share, "各地区销量占全球销量的比例")
+    pie_chart_region_share(region_share, "The proportion of sales in each region to global sales")
+
+    st.write("""
+             The North American market accounts for 50 percent of global game sales, 
+             highlighting its position as the largest and most mature single player gaming market in the world.  
+             Reason analysis: Economic and cultural influence; Mainstream console manufacturers such as Microsoft (Xbox) and Sony (PlayStation) 
+    """)
+
+    #map
+    st.subheader("Regional Sales Map")
+    region_sales_choropleth_map(region_share, raw_df)
+    
+    description ="""
+    - In North America, Europe, and other regions, Action games (including subcategories such as GTA, Assassin's Creed, Call of Duty, etc.)
+    have become the best-selling genre, reflecting a common preference among Western players for instant feedback, high-intensity stimulation, and sensory impact.
+    - The Japanese market is the only "exception" in the global mainstream market, dominated by Role Playing games such as Final Fantasy, Dragon Quest, Pokémon, and Monster Hunter. 
+    This reflects the unique love of Japanese players for growth, complex storytelling, and system immersion.
+    """
+    st.write(description)
+    st.write("—————————————————————————————————————————————————————————————————")
+
