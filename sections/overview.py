@@ -19,7 +19,6 @@ def render(raw_df):
     with right:
         max_year = st.slider("Years", min_value=year_min, max_value=year_cap_max, value=default_max)
 
-    # 基于滑块进行局部筛选（本 section 内部）
     df_year = apply_filters(raw_df, years=(year_min, max_year))
     local_tables = make_tables(df_year)
     

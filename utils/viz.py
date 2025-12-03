@@ -79,8 +79,7 @@ def scatter_publisher_sales(df, title):
     st.altair_chart(chart, use_container_width=True)
 
 def region_sales_choropleth_map(region_share, raw_df):
-
-    # --- 区域国家列表 ---
+    #country
     NA = ["United States", "Canada"]
     EU = [
         "United Kingdom", "Germany", "France", "Italy", "Spain", "Netherlands",
@@ -89,21 +88,13 @@ def region_sales_choropleth_map(region_share, raw_df):
     ]
     JP = ["Japan"]
 
-    # --- 销量字典 ---
     sales_dict = region_share.set_index("Region")["Regional_Sales"].to_dict()
-
-    # --- 世界国家基本数据 ---
     world_df = px.data.gapminder().query("year == 2007")[["country", "iso_alpha"]]
-
-    # 默认全部 Other
     world_df["Region"] = "Other"
 
-    # 批量覆盖 NA/EU/JP
     world_df.loc[world_df["country"].isin(NA), "Region"] = "NA"
     world_df.loc[world_df["country"].isin(EU), "Region"] = "EU"
     world_df.loc[world_df["country"].isin(JP), "Region"] = "JP"
-
-    # 根据 Region 映射销量
     world_df["Sales"] = world_df["Region"].map(sales_dict)
 
     sales_cols = ["NA_Sales", "EU_Sales", "JP_Sales", "Other_Sales"]

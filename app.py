@@ -18,7 +18,7 @@ st.markdown("""
 st.title("🎮 Video Game Sales — Streamlit App")
 st.caption("Source: vgsales.csv | https://www.kaggle.com/datasets/gregorut/videogamesales")
 
-# 加载与预聚合
+# Down
 @st.cache_data(show_spinner=False)
 def get_tables():
     df = load_data()
@@ -26,15 +26,17 @@ def get_tables():
     return df, tables
 
 raw_df, tables = get_tables()
-filtered_df_for_deep = apply_filters(raw_df, years=(1980, 2016))#筛选器
+filtered_df_for_deep = apply_filters(raw_df, years=(1980, 2016))
 filtered_tables_for_deep = make_tables(filtered_df_for_deep)
 
 # sidebar
 with st.sidebar:
     st.image("assets/EFREI-logo.png")
     st.image("assets/WUT-Logo.png")
+    st.markdown("**Course: Data Visualization 2025**")
     st.markdown("**Professor:  Mano Mathew**")
     st.markdown("**Email:  mano.mathew@efrei.fr**")
+    st.markdown("[Check out this LinkedIn](https://www.linkedin.com/in/manomathew/)", unsafe_allow_html=True)
     st.markdown("**Author:  ZIJIAN LIANG**")
     st.markdown("**Email:  zijian.liang@efrei.net**")
     #GitHub
@@ -56,8 +58,7 @@ st.markdown("### Data Quality")
 quality_report = data_quality_report(raw_df)
 
 missing = quality_report['missing'].copy()
-if not missing.empty and 'missing_ratio' in missing.columns:
-    missing['missing_ratio'] = (missing['missing_ratio'] * 100).round(2).astype(str) + '%'
+missing['missing_ratio'] = (missing['missing_ratio'] * 100).round(2).astype(str) + '%'
 
 st.write("Missing ratio:")
 st.dataframe(missing)
@@ -66,7 +67,7 @@ st.dataframe(missing)
 st.markdown("### Comparison before and after cleaning")
 rows_before = int(raw_df.shape[0])
 rows_after = int(filtered_tables_for_deep.get("raw", raw_df).shape[0])
-loss_ratio = (rows_before - rows_after) / rows_before * 100 if rows_before > 0 else 0
+loss_ratio = (rows_before - rows_after) / rows_before * 100 
 
 compare_df = pd.DataFrame({
     "Number of pre cleaning steps": [rows_before],
